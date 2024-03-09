@@ -5,6 +5,7 @@
 #include <QUrlQuery>
 #include <QFileDialog>
 #include <QMessageBox>
+#include <QDebug>
 
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), txtField(new QTextEdit), tableWidget(new QTableWidget), mainLayout(new QHBoxLayout)
 {
@@ -44,7 +45,7 @@ void MainWindow::getPdfFromHttp()
         if(reply->error() == QNetworkReply::NoError)
         {
             QByteArray data = reply->readAll();
-            qDebug() << "Data: " << data.toStdString();
+            qDebug() << "Data: " << data.toStdString().c_str();
             QFileDialog::saveFileContent(data);
         }
             //emit sgProcImage(reply->readAll());
@@ -63,7 +64,7 @@ void MainWindow::replyGetRequest()
     {
         QByteArray data = reply->readAll();
         txtField->setText(QString(data));
-        qDebug() << "Data: " << data.toStdString();
+        qDebug() << "Data: " << data.toStdString().c_str();
         tableWidget->setItem(1, 1, new QTableWidgetItem(QString(data)));
     }
         //emit sgProcImage(reply->readAll());
@@ -122,7 +123,7 @@ void MainWindow::postRequest()
         {
             QByteArray data = reply->readAll();
             txtField->setText(QString(data));
-            qDebug() << "Data: " << data.toStdString();
+            qDebug() << "Data: " << data.toStdString().c_str();
             tableWidget->setItem(1, 1, new QTableWidgetItem(QString(data)));
             
         }
@@ -152,7 +153,7 @@ void MainWindow::readTcpData()
 {
     QByteArray data = pSocket->readAll();
     txtField->setText(QString(data));
-    qDebug() << "Data: " << data.toStdString();
+    qDebug() << "Data: " << data.toStdString().c_str();
 }
 
 void MainWindow::handleButton()

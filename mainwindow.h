@@ -100,7 +100,7 @@ public:
        
         
         menu->addMenu(helpMenu);
-        
+        layout->addWidget(menu);
         
         connect(buttonTest, SIGNAL (released()), this, SLOT (handleButton()));
         connect(buttonTcp, SIGNAL (released()), this, SLOT (getRequest()));
