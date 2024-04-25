@@ -49,6 +49,7 @@ public:
         QVBoxLayout *txtLayout = new QVBoxLayout;
         buttonTest = new QPushButton;
         buttonTcp = new QPushButton;
+        buttonEncryptText = new QPushButton;
         
         //txtField = new QTextEdit;
         
@@ -72,6 +73,9 @@ public:
         
         buttonTcp->setStyleSheet("QPushButton::pressed {background-color: red;} QPushButton {background-color: #fafafa; border-radius: 4px; color: green; max-width: 100px; height: 25px;}");
         buttonTcp->setText("Send http");
+
+        buttonEncryptText->setStyleSheet("QPushButton::pressed {background-color: red;} QPushButton {background-color: #fafafa; border-radius: 4px; color: green; max-width: 100px; height: 25px;}");
+        buttonEncryptText->setText("Encrypt text");
         
         
         
@@ -90,7 +94,7 @@ public:
         getPdfRequestAct->setStatusTip(tr("Get PDF from request"));
         connect(getPdfRequestAct, SIGNAL (triggered()), this, SLOT (getPdfFromHttp()));
         
-        QMenuBar *menu = new QMenuBar(centralWidget());
+        QMenuBar *menu = new QMenuBar(this);
         helpMenu = new QMenu("&Requests");
         helpMenu->addAction(getRequestAct);
         helpMenu->addAction(getPdfRequestAct);
@@ -100,10 +104,11 @@ public:
        
         
         menu->addMenu(helpMenu);
-        layout->addWidget(menu);
+        //layout->addWidget(menu);
         
         connect(buttonTest, SIGNAL (released()), this, SLOT (handleButton()));
         connect(buttonTcp, SIGNAL (released()), this, SLOT (getRequest()));
+        connect(buttonEncryptText, SIGNAL (released()), this, SLOT (encryptText()));
         
         
         txtLayout->addWidget(txtField);
@@ -111,6 +116,7 @@ public:
         
         hLayout->addWidget(buttonTest);
         hLayout->addWidget(buttonTcp);
+        hLayout->addWidget(buttonEncryptText);
         
         layout->addLayout(txtLayout);
         layout->addLayout(hLayout);
@@ -126,6 +132,7 @@ private slots:
     void getRequest();
     void postRequest();
     void getPdfFromHttp();
+    void encryptText();
 public slots:
     void replyGetRequest();
     void replyGetRequestErrorHandler(QNetworkReply::NetworkError);
@@ -141,7 +148,7 @@ private:
     QAction *postRequestAct;
     QAction *getPdfRequestAct;
     
-    QPushButton *buttonTest, *buttonTcp;
+    QPushButton *buttonTest, *buttonTcp, *buttonEncryptText;
     QTextEdit *txtField;
     QTableWidget *tableWidget;
     MainWindow *ui;

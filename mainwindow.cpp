@@ -6,6 +6,7 @@
 #include <QFileDialog>
 #include <QMessageBox>
 #include <QDebug>
+#include "crypt.h"
 
 MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), txtField(new QTextEdit), tableWidget(new QTableWidget), mainLayout(new QHBoxLayout)
 {
@@ -14,67 +15,92 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), txtField(new QTex
     setLayout();
 }
 
+void MainWindow::encryptText()
+{
+    char *code = (char *)malloc( tableWidget->itemAt(0, 0)->text().toStdString().length() * sizeof(char) + 1);
+    char *str = (char *)malloc(txtField->toPlainText().toStdString().length() * sizeof(char) + 1);
+    char* resEnc = (char *)malloc(txtField->toPlainText().toStdString().length() * sizeof(char) * 3 + 1);
+    qDebug() << "length 1 " << tableWidget->itemAt(0, 0)->text().toStdString().length() * sizeof(char);
+    qDebug() << "length 2: " << txtField->toPlainText().toStdString().length() * sizeof(char);
+    qDebug() << "length 3: " << txtField->toPlainText().toStdString().length() * sizeof(char) * 3;
 
+    qDebug() << "Field: " << txtField->toPlainText().toStdString().c_str();
+    
+    code = strcpy(code, tableWidget->itemAt(0, 0)->text().toStdString().c_str());
+    str = strcpy(str, txtField->toPlainText().toStdString().c_str());
+    qDebug() << "String: " << str;
+    qDebug() << "Code: " << code;
+    encryptC(str, code, resEnc);
+    qDebug() << "length 4: " << txtField->toPlainText().toStdString().length() * sizeof(char);
+    qDebug() << "length 5: " << stringLength(resEnc) / 3 * sizeof(char) + 1;
+    char *resDec = (char *)malloc(stringLength(resEnc) / 3 * sizeof(char) + 1);
+    qDebug() << "Encrypted: " << resEnc;
+    decryptC(resEnc, code, resDec);
+    qDebug() << "Decrypted: " << resDec;
+    
+    free(resDec);
+    free(resEnc);
+    free(str);
+    free(code);
+}
 
 void MainWindow::contextMenuEvent(QContextMenuEvent *event)
 {
     QMenu menu(this);
     menu.addAction(getRequestAct);
     menu.addAction(postRequestAct);
-    QTableWidgetItem *item1(tableWidget->item(0,0));
-    if(item1 && tableWidget->itemAt(0, 0)->text().length() > 0)
+    QTableWidgetItem *item1(tableWidget->item(0, 0));
+    if (item1 && tableWidget->itemAt(0, 0)->text().length() > 0)
         menu.actions().at(1)->setEnabled(false);
     else
         menu.actions().at(1)->setEnabled(true);
     menu.exec(event->globalPos());
 }
 
-
 void MainWindow::getPdfFromHttp()
 {
-    
+
     QNetworkRequest request;
-    
+
     request.setUrl(QUrl("http://localhost:5067/Home/GetPdfFromHtml"));
     request.setHeader(QNetworkRequest::ContentTypeHeader, "application/x-www-form-urlencoded");
-      
+
     reply = networkManager->get(request);
-    
+
     connect(reply, &QNetworkReply::finished, [this]()
-    {
-        if(reply->error() == QNetworkReply::NoError)
-        {
-            QByteArray data = reply->readAll();
-            qDebug() << "Data: " << data.toStdString().c_str();
-            QFileDialog::saveFileContent(data);
-        }
-            //emit sgProcImage(reply->readAll());
-        else
-            qDebug() << "Fail to get request!";
-           // procNetworkFinishedReplyError(reply);
-        delete reply;
-        //reply->deleteLater();
-    });
+            {
+                if (reply->error() == QNetworkReply::NoError)
+                {
+                    QByteArray data = reply->readAll();
+                    qDebug() << "Data: " << data.toStdString().c_str();
+                    QFileDialog::saveFileContent(data);
+                }
+                // emit sgProcImage(reply->readAll());
+                else
+                    qDebug() << "Fail to get request!";
+                // procNetworkFinishedReplyError(reply);
+                delete reply;
+                // reply->deleteLater();
+            });
     connect(reply, &QNetworkReply::errorOccurred, this, &MainWindow::replyGetRequestErrorHandler);
 }
 
 void MainWindow::replyGetRequest()
 {
-    if(reply->error() == QNetworkReply::NoError)
+    if (reply->error() == QNetworkReply::NoError)
     {
         QByteArray data = reply->readAll();
         txtField->setText(QString(data));
         qDebug() << "Data: " << data.toStdString().c_str();
         tableWidget->setItem(1, 1, new QTableWidgetItem(QString(data)));
     }
-        //emit sgProcImage(reply->readAll());
+    // emit sgProcImage(reply->readAll());
     else
         qDebug() << "Fail to get request!";
-       // procNetworkFinishedReplyError(reply);
+    // procNetworkFinishedReplyError(reply);
 
     delete reply;
 }
-
 
 void MainWindow::replyGetRequestErrorHandler(QNetworkReply::NetworkError error)
 {
@@ -86,66 +112,62 @@ void MainWindow::replyGetRequestErrorHandler(QNetworkReply::NetworkError error)
     delete reply;
 }
 
-
 void MainWindow::getRequest()
 {
-    
+
     QNetworkRequest request;
-    
+
     request.setUrl(QUrl("http://localhost:5067/Home/GetPhoneById?id=" + txtField->toPlainText()));
     request.setHeader(QNetworkRequest::ContentTypeHeader, "application/x-www-form-urlencoded");
-      
+
     reply = networkManager->get(request);
-    
+
     connect(reply, &QNetworkReply::finished, this, &MainWindow::replyGetRequest);
     connect(reply, &QNetworkReply::errorOccurred, this, &MainWindow::replyGetRequestErrorHandler);
-    
 }
-
 
 void MainWindow::postRequest()
 {
-    
+
     QNetworkRequest request;
     request.setUrl(QUrl("http://localhost:5067/Home/CreateRandomPhone"));
-    
+
     request.setHeader(QNetworkRequest::ContentTypeHeader, "application/x-www-form-urlencoded");
 
     QUrlQuery postData;
     postData.addQueryItem("title", QString::number(55));
-       
-    
+
     reply = networkManager->post(request, postData.toString(QUrl::FullyEncoded).toUtf8());
-    
+
     connect(reply, &QNetworkReply::finished, [this]()
-    {
-        if(reply->error() == QNetworkReply::NoError)
-        {
-            QByteArray data = reply->readAll();
-            txtField->setText(QString(data));
-            qDebug() << "Data: " << data.toStdString().c_str();
-            tableWidget->setItem(1, 1, new QTableWidgetItem(QString(data)));
-            
-        }
-            //emit sgProcImage(reply->readAll());
-        else
-            qDebug() << "Fail to get request!";
-        delete reply;
-        //reply->deleteLater();
-    });
+            {
+                if (reply->error() == QNetworkReply::NoError)
+                {
+                    QByteArray data = reply->readAll();
+                    txtField->setText(QString(data));
+                    qDebug() << "Data: " << data.toStdString().c_str();
+                    tableWidget->setItem(1, 1, new QTableWidgetItem(QString(data)));
+                }
+                // emit sgProcImage(reply->readAll());
+                else
+                    qDebug() << "Fail to get request!";
+                delete reply;
+                // reply->deleteLater();
+            });
     connect(reply, &QNetworkReply::errorOccurred, this, &MainWindow::replyGetRequestErrorHandler);
 }
 
 void MainWindow::connectTcp()
 {
     QByteArray data = this->txtField->toPlainText().toUtf8();
-    
-    //pSocket = new QTcpSocket; // <-- needs to be a member variable: QTcpSocket * _pSocket;
-    connect( pSocket, SIGNAL(readyRead()), SLOT(readTcpData()) );
+
+    // pSocket = new QTcpSocket; // <-- needs to be a member variable: QTcpSocket * _pSocket;
+    connect(pSocket, SIGNAL(readyRead()), SLOT(readTcpData()));
 
     pSocket->connectToHost("127.0.0.1", 1234);
-    if( pSocket->waitForConnected() ) {
-        pSocket->write( data );
+    if (pSocket->waitForConnected())
+    {
+        pSocket->write(data);
     }
 }
 
@@ -188,8 +210,8 @@ void MainWindow::handleButton()
 
 MainWindow::~MainWindow()
 {
-   // pSocket->~QTcpSocket();
-   // networkManager->~QNetworkAccessManager();
+    // pSocket->~QTcpSocket();
+    // networkManager->~QNetworkAccessManager();
     delete pSocket;
     delete networkManager;
     delete txtField;
