@@ -20,38 +20,38 @@ void encryptC(char *str, char *code, char* resStr)
 {
     unsigned long codeLength = stringLength(code);
 
-    char *tmpStr = (char *)malloc(3 * sizeof(char));
+    char *tmpStr = (char *)malloc(4 * sizeof(char));
    // char *resStr = (char *)malloc(stringLength(str) * 3 * sizeof(char));
 
-    for (int i = 0; i < stringLength(str); i++)
+    for (unsigned long i = 0; i < stringLength(str); i++)
     {
 
         str[i] += (int)code[i % codeLength];
 
         if ((int)str[i] < 0)
         {
-            sprintf(tmpStr, "%d", abs((int)str[i]) + 128);
+            snprintf(tmpStr, 4 * sizeof(char), "%d", abs((int)str[i]) + 128);
         }
         else
         {
             if ((int)str[i] == 0)
             {
-                sprintf(tmpStr, "000");
+                snprintf(tmpStr, 4 * sizeof(char), "000");
             }
             else if ((int)str[i] < 10)
             {
-                sprintf(tmpStr, "00%d", (int)str[i]);
+                snprintf(tmpStr, 4 * sizeof(char), "00%d", (int)str[i]);
             }
             else if ((int)str[i] < 100)
             {
-                sprintf(tmpStr, "0%d", (int)str[i]);
+                snprintf(tmpStr, 4 * sizeof(char), "0%d", (int)str[i]);
             }
             else
             {
-                sprintf(tmpStr, "%d", (int)str[i]);
+                snprintf(tmpStr, 4 * sizeof(char), "%d", (int)str[i]);
             }
         }
-        for (int j = i * 3; j < i * 3 + 3; j++)
+        for (unsigned long j = i * 3; j < i * 3 + 3; j++)
         {
             resStr[j] = tmpStr[j - 3 * i];
         }
@@ -69,7 +69,7 @@ void decryptC(char *str, char *code, char* resStr)
    // char *resStr = (char *)malloc(stringLength(str) / 3 * sizeof(char));
     char *tmpInt = (char *)malloc(3 * sizeof(char));
 
-    for (int i = 0; i <= stringLength(str); i++)
+    for (unsigned long i = 0; i <= stringLength(str); i++)
     {
         tmpStr[i % 3] = str[i];
         if (i % 3 == 2)

@@ -73,7 +73,7 @@ void MainWindow::getPdfFromHttp()
                 {
                     QByteArray data = reply->readAll();
                     qDebug() << "Data: " << data.toStdString().c_str();
-                    QFileDialog::saveFileContent(data);
+                    QFileDialog::saveFileContent(data, "");
                 }
                 // emit sgProcImage(reply->readAll());
                 else
