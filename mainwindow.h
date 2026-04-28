@@ -53,9 +53,11 @@ public:
         
         //txtField = new QTextEdit;
         
-        txtField->setFixedWidth(500);
+        //txtField->setFixedWidth(500);
         txtField->setPlaceholderText("Test placeholder");
-        txtField->setFixedHeight(150);
+       // txtField->setFixedHeight(150);
+       // txtField->
+      //  txtField->setStyleSheet("QTextEdit {margin: 20px;}");
         txtField->setAlignment(Qt::AlignJustify);
         
         
@@ -95,6 +97,7 @@ public:
         connect(getPdfRequestAct, SIGNAL (triggered()), this, SLOT (getPdfFromHttp()));
         
         QMenuBar *menu = new QMenuBar(this);
+        menu->setStyleSheet("QMenuBar::item::selected {background-color: #ee00ff;} QMenuBar::item {background-color: #abcdef;}");
         helpMenu = new QMenu("&Requests");
         helpMenu->addAction(getRequestAct);
         helpMenu->addAction(getPdfRequestAct);
@@ -104,7 +107,7 @@ public:
        
         
         menu->addMenu(helpMenu);
-        //layout->addWidget(menu);
+        layout->addWidget(menu);
         
         connect(buttonTest, SIGNAL (released()), this, SLOT (handleButton()));
         connect(buttonTcp, SIGNAL (released()), this, SLOT (getRequest()));
@@ -120,6 +123,7 @@ public:
         
         layout->addLayout(txtLayout);
         layout->addLayout(hLayout);
+        
         
         setCentralWidget(new QWidget);
         centralWidget()->setLayout(layout);

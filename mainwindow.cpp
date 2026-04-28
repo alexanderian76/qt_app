@@ -17,17 +17,17 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), txtField(new QTex
 
 void MainWindow::encryptText()
 {
-    char *code = (char *)malloc( tableWidget->itemAt(0, 0)->text().toStdString().length() * sizeof(char) + 1);
+    char *code = (char *)malloc( tableWidget->item(0, 0)->text().toStdString().length() * sizeof(char) + 1);
     char *str = (char *)malloc(txtField->toPlainText().toStdString().length() * sizeof(char) + 1);
     char* resEnc = (char *)malloc(txtField->toPlainText().toStdString().length() * sizeof(char) * 3 + 1);
-    qDebug() << "length 1 " << tableWidget->itemAt(0, 0)->text().toStdString().length() * sizeof(char);
+    qDebug() << "length 1 " << tableWidget->item(0, 0)->text().toStdString().length() * sizeof(char);
     qDebug() << "length 2: " << txtField->toPlainText().toStdString().length() * sizeof(char);
     qDebug() << "length 3: " << txtField->toPlainText().toStdString().length() * sizeof(char) * 3;
 
     qDebug() << "Field: " << txtField->toPlainText().toStdString().c_str();
     
-    code = strcpy(code, tableWidget->itemAt(0, 0)->text().toStdString().c_str());
-    str = strcpy(str, txtField->toPlainText().toStdString().c_str());
+    strcpy(code, tableWidget->item(0, 0)->text().toStdString().c_str());
+    strcpy(str, txtField->toPlainText().toStdString().c_str());
     qDebug() << "String: " << str;
     qDebug() << "Code: " << code;
     encryptC(str, code, resEnc);
@@ -37,7 +37,10 @@ void MainWindow::encryptText()
     qDebug() << "Encrypted: " << resEnc;
     decryptC(resEnc, code, resDec);
     qDebug() << "Decrypted: " << resDec;
-    
+
+    QTableWidgetItem* item = new QTableWidgetItem(resDec);
+    tableWidget->setItem(0, 1, item);
+
     free(resDec);
     free(resEnc);
     free(str);
@@ -180,6 +183,8 @@ void MainWindow::readTcpData()
 
 void MainWindow::handleButton()
 {
+    tableWidget->setColumnCount(tableWidget->columnCount() + 1);
+    tableWidget->setRowCount(tableWidget->rowCount() + 1);
     char *c = "123";
     int n = 1;
     int *t = &n;
