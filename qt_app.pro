@@ -12,10 +12,12 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 SOURCES += \
     main.cpp\
     mainwindow.cpp\
-    crypt.cpp
+    crypt.cpp\
+    paintscene.cpp
 
 HEADERS += mainwindow.h
 HEADERS += crypt.h
+HEADERS += paintscene.h
 
 
  

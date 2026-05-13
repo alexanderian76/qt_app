@@ -17,15 +17,15 @@ MainWindow::MainWindow(QWidget *parent) : QMainWindow(parent), txtField(new QTex
 
 void MainWindow::encryptText()
 {
-    char *code = (char *)malloc( tableWidget->item(0, 0)->text().toStdString().length() * sizeof(char) + 1);
+    char *code = (char *)malloc(tableWidget->item(0, 0)->text().toStdString().length() * sizeof(char) + 1);
     char *str = (char *)malloc(txtField->toPlainText().toStdString().length() * sizeof(char) + 1);
-    char* resEnc = (char *)malloc(txtField->toPlainText().toStdString().length() * sizeof(char) * 3 + 1);
+    char *resEnc = (char *)malloc(txtField->toPlainText().toStdString().length() * sizeof(char) * 3 + 1);
     qDebug() << "length 1 " << tableWidget->item(0, 0)->text().toStdString().length() * sizeof(char);
     qDebug() << "length 2: " << txtField->toPlainText().toStdString().length() * sizeof(char);
     qDebug() << "length 3: " << txtField->toPlainText().toStdString().length() * sizeof(char) * 3;
 
     qDebug() << "Field: " << txtField->toPlainText().toStdString().c_str();
-    
+
     strcpy(code, tableWidget->item(0, 0)->text().toStdString().c_str());
     strcpy(str, txtField->toPlainText().toStdString().c_str());
     qDebug() << "String: " << str;
@@ -38,8 +38,11 @@ void MainWindow::encryptText()
     decryptC(resEnc, code, resDec);
     qDebug() << "Decrypted: " << resDec;
 
-    QTableWidgetItem* item = new QTableWidgetItem(resDec);
+    QTableWidgetItem *item = new QTableWidgetItem(resDec);
     tableWidget->setItem(0, 1, item);
+
+    QTableWidgetItem *itemEnc = new QTableWidgetItem(resEnc);
+    tableWidget->setItem(0, 2, itemEnc);
 
     free(resDec);
     free(resEnc);
@@ -49,6 +52,13 @@ void MainWindow::encryptText()
 
 void MainWindow::contextMenuEvent(QContextMenuEvent *event)
 {
+
+    if(view && view->isVisible() && view->geometry().contains(event->pos()))
+    {
+        event->ignore();
+        return;
+    }
+        
     QMenu menu(this);
     menu.addAction(getRequestAct);
     menu.addAction(postRequestAct);
@@ -57,6 +67,7 @@ void MainWindow::contextMenuEvent(QContextMenuEvent *event)
         menu.actions().at(1)->setEnabled(false);
     else
         menu.actions().at(1)->setEnabled(true);
+    
     menu.exec(event->globalPos());
 }
 
@@ -185,6 +196,7 @@ void MainWindow::handleButton()
 {
     tableWidget->setColumnCount(tableWidget->columnCount() + 1);
     tableWidget->setRowCount(tableWidget->rowCount() + 1);
+    char *qw = (char *)0x0;
     char *c = "123";
     int n = 1;
     int *t = &n;
@@ -211,7 +223,38 @@ void MainWindow::handleButton()
     c = c - 3;
     qDebug() << "*q" << *q;
     qDebug() << "c" << c;
+
+    qDebug() << "qw - " << qw;
+    qDebug() << "qw == 0" << (qw == 0x0);
+    qDebug() << "&qw - " << &qw;
+
+    this->view->setVisible(!this->view->isVisible());
 };
+
+
+
+void MainWindow::saveButtonHandler() {
+   // send();
+  //  QString filename= QFileDialog::getSaveFileName(this, "Save As");
+
+   // QGraphicsView* view = new QGraphicsView(scene,this);
+  //  QString fileName = "file_name.png";
+  //  QPixmap pixMap = view->grab(view->sceneRect().toRect());
+   // QImage img = pixMap.toImage();
+    
+    
+    QImage image(scene->width(), scene->height(), QImage::Format_RGB32);
+    image.fill(NULL);
+    QPainter painter(&image);
+    scene->render(&painter);
+    //image.save("/somepath/result.png");
+    
+    
+    image.save(QFileDialog::getSaveFileName(0,tr("Save image"),QDir::currentPath(),"Image PNG(*.png);; Image BMP (*.bmp);; Jpeg (*.jpg)"));
+    
+   // fileName = QFileDialog::getSaveFileName(pixMap.toImage(), "Save file", "", ".png");
+    //pixMap.save(fileName);
+}
 
 MainWindow::~MainWindow()
 {
@@ -222,4 +265,11 @@ MainWindow::~MainWindow()
     delete txtField;
     delete tableWidget;
     delete mainLayout;
+    delete scene;
+    delete view;
+    delete buttonTest;
+    delete saveButton;
+    delete buttonEncryptText;
+    delete buttonTcp;
+    
 }
